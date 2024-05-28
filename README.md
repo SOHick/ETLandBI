@@ -1,2 +1,2 @@
-# engine = create_engine(f'postgresql+psycopg2://{pg_secret["db_user"]}:{pg_secret["db_password"]}@{pg_secret["db_host"]}:{pg_secret["db_port"]}/{pg_secret["db_name"]}') - соеденение с PostgreSQL
-# adult.to_sql('dataNetflix', engine, index=False, if_exists='replace') - create table "dataNetflix"
+engine = create_engine(f'postgresql+psycopg2://{pg_secret["db_user"]}:{pg_secret["db_password"]}@{pg_secret["db_host"]}:{pg_secret["db_port"]}/{pg_secret["db_name"]}') - соеденение с PostgreSQL
+adult.to_sql('datacar', engine, index=False, if_exists='replace') - create table "datacar"
