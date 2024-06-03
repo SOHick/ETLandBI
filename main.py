@@ -18,8 +18,7 @@ ch_secret = {
     'db_user': 'localhost'
 }
 
-
-dftest = pd.read_csv("/kaggle/input/cars24com-used-cars-dataset/cars_24_combined.csv", encoding='latin1', delimiter=',', header=0)
+df = pd.read_csv("data/cars_23.csv", encoding='latin1', delimiter=',', header=0)
 def push_PostgreSQL():
     df = pd.read_csv("data/cars_23.csv", encoding='latin1', delimiter=',', header=0)
     df = df.rename(columns={df.columns[0]: 'id'})
