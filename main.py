@@ -1,7 +1,12 @@
 import pandas as pd
 import psycopg2
+import kaggle
+from datetime import date,datetime
 from clickhouse_driver import Client
 from sqlalchemy import create_engine
+from apscheduler.schedulers.background import BlockingScheduler
+
+scheduler = BlockingScheduler()
 
 pg_secret = {
     'db_host': 'localhost',
@@ -14,13 +19,17 @@ ch_secret = {
     'db_host': 'localhost',
     'db_name': 'default',
     'db_password': 'root',
-    'db_port': '8123',
+    'db_port': '9000',
     'db_user': 'localhost'
 }
+def testSQL():
+    kaggle.api.dataset_download_file('ujjwalwadhwa/cars24com-used-cars-dataset', file_name='cars_24_combined.csv', path='data/')
 
-df = pd.read_csv("data/cars_23.csv", encoding='latin1', delimiter=',', header=0)
+
+
 def push_PostgreSQL():
-    df = pd.read_csv("data/cars_23.csv", encoding='latin1', delimiter=',', header=0)
+    testSQL()
+    df = pd.read_csv("data/cars_24_combined.csv", encoding='latin1', delimiter=',', header=0)
     df = df.rename(columns={df.columns[0]: 'id'})
     df = df.rename(columns={df.columns[1]: 'car_name'})
     engine = create_engine(
@@ -29,6 +38,8 @@ def push_PostgreSQL():
 
 
 def transfer_data():
+    # Выгрузка данных в PostgreSQL
+    push_PostgreSQL()
     # Подключение к PostgreSQL
     connection_pg = psycopg2.connect(
         database=pg_secret['db_name'],
@@ -40,7 +51,7 @@ def transfer_data():
     pg_cursor = connection_pg.cursor()
 
     # Подключение к ClickHouse
-    client_ch = Client(host='localhost', port=9000, password='root')
+    client_ch = Client(host=ch_secret['db_host'], port=ch_secret['db_port'], password=ch_secret['db_password'])
 
     # Выборка данных из PostgreSQL
     pg_cursor.execute("SELECT * FROM datacar;")
@@ -70,3 +81,6 @@ def transfer_data():
     client_ch.disconnect()
 
 
+# Выполняется ежедневно в 8:00 часов
+scheduler.add_job(transfer_data, 'cron', hour=8)
+scheduler.start()
