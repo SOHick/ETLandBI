@@ -1,6 +1,4 @@
-import clickhouse_driver
 import pandas as pd
-from datetime import datetime
 import psycopg2
 from clickhouse_driver import Client
 from sqlalchemy import create_engine
@@ -21,6 +19,7 @@ ch_secret = {
 }
 
 
+dftest = pd.read_csv("/kaggle/input/cars24com-used-cars-dataset/cars_24_combined.csv", encoding='latin1', delimiter=',', header=0)
 def push_PostgreSQL():
     df = pd.read_csv("data/cars_23.csv", encoding='latin1', delimiter=',', header=0)
     df = df.rename(columns={df.columns[0]: 'id'})
@@ -31,27 +30,6 @@ def push_PostgreSQL():
 
 
 def transfer_data():
-    # Connect to PostgreSQL
-    connection_pg = psycopg2.connect(
-        database=pg_secret['db_name'],
-        user=pg_secret['db_user'],
-        password=pg_secret['db_password'],
-        host=pg_secret['db_host'],
-        port=pg_secret['db_port']
-    )
-    pg_cursor = connection_pg.cursor()
-    # Выборка данных из PostgreSQL
-    pg_cursor.execute("SELECT * FROM datacar;")
-    rows = pg_cursor.fetchall()
-    # Connect to ClickHouse
-    client_ch = Client(host='localhost', port=9000, password='root')
-
-    # Запись данных в ClickHouse
-    # result = client_ch.execute('INSERT INTO datacarCH (id,car_name,year,distance,owner,fuel,location,drive,type,price) VALUES',
-    #                            rows)
-
-
-def ch_clickhouse_driver():
     # Подключение к PostgreSQL
     connection_pg = psycopg2.connect(
         database=pg_secret['db_name'],
@@ -82,10 +60,10 @@ def ch_clickhouse_driver():
                     rows[i][j] = 'NULL'
         rows[i] = tuple(rows[i])
 
-
     # Запись данных в ClickHouse
-    result = client_ch.execute('INSERT INTO datacarCH (id,car_name,year,distance,owner,fuel,location,drive,type,price) VALUES',
-                               rows)
+    result = client_ch.execute(
+        'INSERT INTO datacarCH (id,car_name,year,distance,owner,fuel,location,drive,type,price) VALUES',
+        rows)
 
     # Закрытие соединений
     pg_cursor.close()
@@ -93,6 +71,3 @@ def ch_clickhouse_driver():
     client_ch.disconnect()
 
 
-
-
-ch_clickhouse_driver()

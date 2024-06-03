@@ -3,6 +3,5 @@ matplotlib == 3.8.4
 pandas == 2.2.2
 sqlalchemy == 2.0.30
 psycopg2 == 2.9.9
-datetime2 == 0.9.4
 clickhouse-driver == 0.2.7
 infi.clickhouse_orm==1.0.4
