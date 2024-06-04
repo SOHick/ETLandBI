@@ -1,7 +1,6 @@
 import pandas as pd
 import psycopg2
 import kaggle
-from datetime import date,datetime
 from clickhouse_driver import Client
 from sqlalchemy import create_engine
 from apscheduler.schedulers.background import BlockingScheduler
@@ -23,7 +22,8 @@ ch_secret = {
     'db_user': 'localhost'
 }
 def testSQL():
-    kaggle.api.dataset_download_file('ujjwalwadhwa/cars24com-used-cars-dataset', file_name='cars_24_combined.csv', path='data/')
+    kaggle.api.dataset_download_file('ujjwalwadhwa/cars24com-used-cars-dataset',
+                                     file_name='cars_24_combined.csv', path='data/')
 
 
 
@@ -33,7 +33,8 @@ def push_PostgreSQL():
     df = df.rename(columns={df.columns[0]: 'id'})
     df = df.rename(columns={df.columns[1]: 'car_name'})
     engine = create_engine(
-        f'postgresql+psycopg2://{pg_secret["db_user"]}:{pg_secret["db_password"]}@{pg_secret["db_host"]}:{pg_secret["db_port"]}/{pg_secret["db_name"]}')
+        f'postgresql+psycopg2://{pg_secret["db_user"]}:{pg_secret["db_password"]}@'
+        f'{pg_secret["db_host"]}:{pg_secret["db_port"]}/{pg_secret["db_name"]}')
     df.to_sql('datacar', engine, index=False, if_exists='replace')
 
 
