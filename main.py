@@ -70,7 +70,7 @@ def transfer_data():
                 else:
                     rows[i][j] = 'NULL'
         rows[i] = tuple(rows[i])
-
+    client_ch.execute('TRUNCATE TABLE datacarCH ')
     # Запись данных в ClickHouse
     result = client_ch.execute(
         'INSERT INTO datacarCH (id,car_name,year,distance,owner,fuel,location,drive,type,price) VALUES',
@@ -83,5 +83,6 @@ def transfer_data():
 
 
 # Выполняется ежедневно в 8:00 часов
-scheduler.add_job(transfer_data, 'cron', hour=8)
-scheduler.start()
+# scheduler.add_job(transfer_data, 'cron', hour=8)
+# scheduler.start()
+transfer_data()
